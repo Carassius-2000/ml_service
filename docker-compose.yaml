@@ -1,0 +1,23 @@
+services:
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile.training
+    volumes:
+      - ./model_registry:/training/model_registry
+    profiles: ["training"]
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "81:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    volumes:
+      - ./model_registry:/api/model_registry
+    profiles: ["api"]
